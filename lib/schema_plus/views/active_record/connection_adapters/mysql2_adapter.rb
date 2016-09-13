@@ -2,12 +2,12 @@ module SchemaPlus::Views
   module ActiveRecord
     module ConnectionAdapters
       module Mysql2Adapter
-
-        def views(name = nil)
-          SchemaMonkey::Middleware::Schema::Views.start(connection: self, query_name: name, views: []) { |env|
-            select_all("SELECT table_name FROM information_schema.views WHERE table_schema = SCHEMA()", env.query_name).each do |row|
-              env.views << row["table_name"]
-            end
+        # Views is now natively supported by AR5.
+        # This definition just wraps the native view implementation with a
+        # middleware
+        def views
+          SchemaMonkey::Middleware::Schema::Views.start(connection: self, views: []) { |env|
+            env.views += super
           }.views
         end
 
@@ -26,7 +26,6 @@ module SchemaPlus::Views
             end
           }.definition
         end
-
       end
     end
   end
