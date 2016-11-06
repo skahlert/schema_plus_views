@@ -2,15 +2,6 @@ module SchemaPlus::Views
   module ActiveRecord
     module ConnectionAdapters
       module PostgresqlAdapter
-        # Views is now natively supported by AR5.
-        # This definition just wraps the native view implementation with a
-        # middleware
-        def views
-          SchemaMonkey::Middleware::Schema::Views.start(connection: self, views: []) { |env|
-            env.views += super
-          }.views
-        end
-
         def view_definition(view_name, name = nil) #:nodoc:
           SchemaMonkey::Middleware::Schema::ViewDefinition.start(connection: self, view_name: view_name, query_name: name) { |env|
               result = env.connection.query(<<-SQL, name)

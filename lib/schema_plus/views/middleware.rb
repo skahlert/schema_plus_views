@@ -34,9 +34,15 @@ module SchemaPlus::Views
     # for tables
 
     module Schema
-      module Views
-        ENV = [:connection, :views]
+      module Postgresql
+        module Views
+          # Override middleware for PostgreSQL
+          def before(env)
+            env.where_constraints << env.connection._filter_user_data_sources_sql
+          end
+        end
       end
+
       module ViewDefinition
         ENV = [:connection, :view_name, :query_name, :definition]
       end

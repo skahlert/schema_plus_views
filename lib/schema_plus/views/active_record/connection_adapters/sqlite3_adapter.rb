@@ -2,15 +2,6 @@ module SchemaPlus::Views
   module ActiveRecord
     module ConnectionAdapters
       module Sqlite3Adapter
-        # Views is now natively supported by AR5.
-        # This definition just wraps the native view implementation with a
-        # middleware
-        def views
-          SchemaMonkey::Middleware::Schema::Views.start(connection: self, views: []) { |env|
-            env.views += super
-          }.views
-        end
-
         def view_definition(view_name, name = nil)
           SchemaMonkey::Middleware::Schema::ViewDefinition.start(connection: self, view_name: view_name, query_name: name) { |env|
             sql = env.connection.execute("SELECT sql FROM sqlite_master WHERE type='view' AND name=#{quote(env.view_name)}", env.query_name).collect{|row| row["sql"]}.first
